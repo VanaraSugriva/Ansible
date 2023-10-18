@@ -1,0 +1,105 @@
+---
+
+- hosts: lb
+  become: true
+  tasks:
+    - name: Install HAProxy
+      apt:
+        name: haproxy
+
+    - name: Configure HAProxy
+      template:
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+
+    - name: Enable HAProxy service
+      systemd:
+        name: haproxy
+        enabled: true
+        state: started
+
+    - name: Install Keepalived
+      apt:
+        name: keepalived
+
+    - name: Enable Keepalived service
+      systemd:
+        name: keepalived
+        enabled: true
+        state: started
+
+    - name: Line insert at the end of sysctl.conf
+      lineinfile:
+        path: "/etc/sysctl.conf"
+        line: net.ipv4.ip_nonlocal_bind=1
+
+    - name: Sysctl config
+        sysctl:
+          name: net.ipv4.ip_nonlocal_bind=1
+          state: present
+          reload: yes
+
+    - name: User keepalived_script add
+      user:
+        name: keepalived_script
+        shell: /sbin/nologin
+        create_home: no
+        append: yes
+        state: present
+
+- hosts: lb-01
+  become: true
+  tasks:
+    - name: Configure Keepalived
+      template:
+        src: lb-01.keepalived.conf.j2
+        dest: /etc/keepalived/keepalived.conf
+
+- hosts: lb-02
+  become: true
+  tasks:
+    - name: Configure Keepalived
+      template:
+        src: lb-02.keepalived.conf.j2
+        dest: /etc/keepalived/keepalived.conf
+
+
+- hosts: web
+  become: true
+  tasks:
+    - name: Install Apache2
+      apt:
+        name: apache2
+
+        #    - name: Configure VirtualHost
+        #      template:
+        #        src: virtualhost.conf.j2
+        #        dest: /etc/apache2/sites-available/vs_app.conf
+        #
+        #    - name: Enable Your App site
+        #      command: a2ensite vs_app
+        #
+        #    - name: Disable default site
+        #      command: a2dissite 000-default
+
+    - name: Enable Apache2 service
+      systemd:
+        name: apache2
+        enabled: true
+        state: started
+
+- hosts: web-01
+  become: true
+  tasks:
+    - name: Configure index.html
+      template:
+        src: web-01.index.html.j2
+        dst: /var/www/html/index.html
+
+- hosts: web-02
+  become: true
+  tasks:
+    - name: Configure index.html
+      template:
+        src: web-02.index.html.j2
+        dst: /var/www/html/index.html

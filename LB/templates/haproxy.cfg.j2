@@ -1,0 +1,17 @@
+listen stats
+        bind 0.0.0.0:8989
+        mode http
+        stats enable
+        stats url /haproxy_stats
+        stats realm HAProxy\ Statistics
+        stats auth admin:pa$$w0rD
+        stats admin if TRUE
+
+frontend http-in
+    bind *:80
+    default_backend backend-servers
+
+backend backend-servers
+    balance roundrobin
+    server web1 192.168.56.21:80 check
+    server web2 192.168.56.22:80 check

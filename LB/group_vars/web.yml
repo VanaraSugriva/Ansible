@@ -1,0 +1,9 @@
+web-01:
+ip: 192.168.56.21
+name: web-01
+color: #b85dff
+
+web-02:
+ip: 192.168.56.22
+name: web-02
+color: #33d7ff

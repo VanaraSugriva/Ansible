@@ -1,0 +1,11 @@
+<VirtualHost *:80>
+    ServerName vs_app.com
+    DocumentRoot /var/www/vs_app/public
+
+    <Directory /var/www/vs_app/public>
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+        Require all granted
+    </Directory>
+</VirtualHost>

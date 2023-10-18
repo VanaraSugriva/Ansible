@@ -1,0 +1,11 @@
+lb-01:
+  ip: 192.168.56.11
+  router_id: lb01
+  state: MASTER
+  priority: 100
+
+lb-02:
+  ip: 192.168.56.12
+  router_id: lb02
+  state: BACKUP
+  priority: 99
